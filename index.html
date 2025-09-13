@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>To Do List</title>
+<link
+  href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css"
+  rel="stylesheet"
+/>
+<style>
+
+* {
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  color: white;
+}
+
+::selection{
+  background: rgb(46, 10, 94);
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(to right, rgb(81, 0, 187), rgb(46, 10, 94));
+}
+
+.container {
+  background-color: rgb(128, 128, 128);
+  display: flex;
+  width: 1300px;
+  height: 700px;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to right, rgb(81, 0, 187), rgb(139, 56, 248));
+  height: 60px;
+  margin: 10px;
+  border-radius: 8px;
+  padding: 10px;
+  position: relative;
+}
+
+/* أزرار الاضافة، تغيير اللغة، الحذف الكلي */
+.addNewTask,
+.deleteAll {
+  position: absolute;
+  margin: 10px;
+  height: 40px;
+  width: 40px;
+  background-color: rgb(207, 207, 207);
+  font-size: 20px;
+  border-radius: 100px;
+  border: 2px rgb(218, 218, 218) solid;
+  outline: none;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.addNewTask {
+  right: 0;
+}
+
+.deleteAll {
+  right: 50px;
+  background-color: rgb(51, 0, 0);
+  border: 2px rgb(68, 0, 0) solid;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+.deleteAll i {
+  color: rgb(128, 0, 0);
+  transition: 0.3s;
+}
+
+.deleteAll:hover i {
+  color: red;
+}
+
+.deleteAll:hover {
+  background-color: rgb(163, 0, 0);
+  border: 2px red solid;
+  box-shadow: 0 0 15px red;
+}
+
+.addNewTask:hover {
+  box-shadow: 0 0 15px rgb(255, 255, 255);
+}
+
+.addNewTask i {
+  color: rgb(81, 0, 187);
+  font-size: 20px;
+}
+
+/* محتوى المهام */
+.mainContent {
+  padding: 10px;
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+/* بطاقة المهمة */
+.card {
+  background-color: rgba(243, 230, 230, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 5px rgba(255, 255, 255, 0.43) solid;
+  border-radius: 8px;
+  margin: 10px;
+  position: relative;
+  transition: 0.3s;
+  box-shadow: none; /* افتراضي بدون ظل */
+}
+
+.card:hover {
+  box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.36);
+}
+
+/* ظل ملون يظهر فقط عند hover مع لون مخصص */
+.card.randomColor:hover {
+  box-shadow: 0 0 15px 3px var(--card-bg-color);
+}
+
+/* قسم الأزرار داخل البطاقة */
+.buttons-sec {
+  padding: 20px;
+  width: 30%;
+  display: flex;
+  justify-content: space-around;
+}
+
+.buttons-sec button,
+.windowDeleteAll button {
+  width: 50px;
+  height: 50px;
+  border-radius: 100px;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* ألوان الأزرار */
+.buttons-sec .btn1 {
+  background-color: rgb(0, 119, 255);
+}
+
+.buttons-sec .btn1:hover {
+  background-color: rgb(0, 162, 255);
+  box-shadow: 0 0 15px 3px rgb(0, 92, 145);
+}
+
+.buttons-sec .btn2 {
+  background-color: rgb(0, 156, 0);
+}
+
+.buttons-sec .btn2:hover {
+  background-color: rgb(0, 207, 0);
+  box-shadow: 0 0 15px 3px rgb(0, 170, 0);
+}
+
+.buttons-sec .btn2.clicked {
+  background-color: rgb(112, 112, 112);
+  border: 3px rgba(255, 255, 255, 0.43) solid;
+}
+
+.buttons-sec .btn2.clicked:hover {
+  background-color: rgb(153, 153, 153);
+  box-shadow: 0 0 15px 3px rgb(112, 112, 112);
+}
+
+.buttons-sec .btn3 {
+  background-color: rgb(160, 0, 0);
+}
+
+.buttons-sec .btn3:hover {
+  background-color: rgb(218, 0, 0);
+  box-shadow: 0 0 15px 3px rgb(136, 0, 0);
+}
+
+.buttons-sec .btn4 {
+  background-color: rgb(83, 83, 83);
+}
+
+.buttons-sec .btn4 i {
+  color: rgb(165, 165, 165);
+}
+
+.buttons-sec .btn4:hover {
+  background-color: rgb(124, 124, 124);
+  box-shadow: 0 0 15px 3px rgb(39, 39, 39);
+}
+
+/* تحديث أنماط زر الفرشاة */
+.buttons-sec .btn4.pressed {
+  background-color: var(--theme-color);
+  border: 3px rgba(255, 255, 255, 0.7) solid;
+  box-shadow: 0 0 15px 3px white !important;
+}
+
+.buttons-sec .btn4.pressed i {
+  color: white !important;
+}
+
+/* شريط التمرير */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.48);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(rgb(0, 38, 255), rgb(140, 0, 255));
+}
+
+.txt {
+  width: 450px;
+  margin: 5px;
+  display: block;
+  text-align: right;
+}
+
+.txt h2 {
+  max-height: 100px;
+  overflow-y: auto;
+  padding: 5px;
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 5px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: end;
+  padding: 10px;
+}
+
+/* نافذة تأكيد الحذف */
+.window-delete {
+  background-color: rgba(255, 108, 108, 0.81);
+  border-radius: 8px;
+  position: absolute;
+  padding: 10px;
+  left: 400px;
+  top: -10px;
+  display: none;
+}
+
+.window-delete h2,
+.windowDeleteAll h2 {
+  color: rgb(134, 36, 36);
+}
+
+/* العنوان داخل المهمة */
+.h2 {
+  color: rgb(221, 221, 221);
+}
+
+/* لون النص عند التبديل */
+.toggletextColor {
+  color: rgb(88, 88, 88);
+}
+
+/* خيارات نافذة الحذف */
+.option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.option .yesBtn {
+  color: rgba(255, 0, 0, 0.81);
+  background-color: rgba(175, 0, 0, 0.81);
+}
+
+.option .yesBtn:hover {
+  background-color: rgba(219, 1, 1, 0.81);
+  box-shadow: 0 0 15px 3px rgba(255, 0, 0, 0.81);
+}
+
+.option .noBtn {
+  color: rgba(72, 255, 0, 0.81);
+  background-color: rgba(29, 175, 0, 0.81);
+}
+
+.option .noBtn:hover {
+  background-color: rgba(70, 219, 1, 0.81);
+  box-shadow: 0 0 15px 3px rgba(0, 255, 13, 0.81);
+}
+
+/* حقل التحرير */
+.edit-input {
+  width: 95%;
+  padding: 10px;
+  font-size: 1.2rem;
+  border: 2px solid #3b009b;
+  border-radius: 5px;
+  background-color: rgba(63, 0, 105, 0.25);
+  color: white;
+  outline: none;
+}
+
+/* وقت المهمة */
+.time {
+  background-color: rgba(151, 150, 150, 0.6);
+  padding: 8px 15px;
+  width: fit-content;
+  border-radius: 12px;
+  display: inline-flex;
+  justify-content: center;
+  font-weight: 600;
+  align-items: center;
+  border: 3px rgba(255, 255, 255, 0.63) solid;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 0.95rem;
+  color: #222;
+  margin-left: 10px;
+  direction: rtl;
+}
+
+
+/* زر لون النص */
+.textColor {
+  margin-left: 20px;
+  height: 40px;
+  width: 40px;
+  background-color: rgb(88, 88, 88);
+  border-radius: 100px;
+  border: 2px rgb(75, 75, 75) solid;
+  cursor: pointer;
+}
+
+.textColorLight {
+  background-color: rgb(221, 221, 221);
+  border: 2px rgb(197, 197, 197) solid;
+}
+
+/* أداة اختيار اللون */
+#colorPickerContainer {
+  position: absolute;
+  z-index: 9999;
+  display: none;
+  box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  background: #222;
+  padding: 10px;
+}
+
+/* نافذة حذف الكل */
+.windowDeleteAll {
+  background-color: rgba(105, 4, 4, 0.81);
+  border-radius: 8px;
+  position: absolute;
+  padding: 10px;
+  right: 40px;
+  top: -95px;
+  display: none;
+}
+
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>My Tasks</h1>
+      <button class="addNewTask"><i class="fa-solid fa-plus"></i></button>
+      <button class="deleteAll"><i style="position: relative;" class="fa-solid fa-square-xmark"></i></button>
+      <div class="windowDeleteAll">
+        <h2>Are you sure you want to delete all?</h2>
+        <div class="option">
+          <button class="yesBtnDeleteAll yesBtn">Yes</button>
+          <button class="noBtnDeleteAll noBtn">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mainContent">
+      <!-- الأزرار الرئيسية تظهر هنا -->
+    </div>
+  </div>
+
+  <!-- حاوية عرض أداة اختيار اللون -->
+  <div id="colorPickerContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+<script>
+// ========================= المتغيرات العامة =========================
+const mainContent = document.querySelector(".mainContent");
+const addNewTaskBtn = document.querySelector(".addNewTask");
+const colorPickerContainer = document.getElementById("colorPickerContainer");
+const deleteAllBtn = document.querySelector(".deleteAll");
+const windowDeleteAll = document.querySelector(".windowDeleteAll");
+const yesBtnDeleteAll = document.querySelector(".yesBtnDeleteAll");
+const noBtnDeleteAll = document.querySelector(".noBtnDeleteAll");
+
+let currentCard = null;
+let hoverTimer;
+let pressTimer;
+let isDragging = false;
+
+const STORAGE_KEY = "smart_todo_data_v1";
+
+// ========================= أداة اختيار الألوان (iro.js) =========================
+const colorPicker = new iro.ColorPicker(colorPickerContainer, {
+  width: 200,
+  color: "#f44336",
+  layout: [
+    { component: iro.ui.Box },
+    { component: iro.ui.Slider, options: { sliderType: "hue" } },
+    { component: iro.ui.Slider, options: { sliderType: "alpha" } }
+  ]
+});
+
+const maxSavedColors = 5;
+const savedColorsContainer = document.createElement("div");
+savedColorsContainer.style.display = "flex";
+savedColorsContainer.style.justifyContent = "center";
+savedColorsContainer.style.gap = "5px";
+savedColorsContainer.style.marginTop = "10px";
+colorPickerContainer.appendChild(savedColorsContainer);
+
+let savedColors = []; // سيتم تحميلها من Local Storage
+
+// ========================= أدوات مساعدة =========================
+function getRandomHexColor() {
+  return "#" + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0");
+}
+
+function updateDeleteAllButtonVisibility() {
+  const cards = document.querySelectorAll(".card");
+  deleteAllBtn.style.display = cards.length ? "block" : "none";
+}
+
+function hideColorPicker() {
+  colorPickerContainer.style.display = "none";
+  currentCard = null;
+}
+
+function showColorPicker(btn, card) {
+  currentCard = card;
+  const rect = btn.getBoundingClientRect();
+  colorPickerContainer.style.top = `${rect.bottom + window.scrollY + 5}px`;
+  colorPickerContainer.style.left = `${rect.left + window.scrollX}px`;
+  colorPickerContainer.style.display = "block";
+  colorPicker.show();
+}
+
+// ========================= التخزين =========================
+function collectTasksFromDOM() {
+  const tasks = [];
+  document.querySelectorAll(".card").forEach((card) => {
+    const h2 = card.querySelector(".h2");
+    const timeSpan = card.querySelector(".time span");
+    const doneBtn = card.querySelector(".done");
+    const textColorBtn = card.querySelector(".textColor");
+    const themeBtn = card.querySelector(".theme");
+    const changeColorIcon = card.querySelector(".changeColor");
+
+    tasks.push({
+      text: h2?.innerText || "",
+      time: timeSpan?.innerText || "",
+      done: !!doneBtn?.classList.contains("clicked"),
+      textColored: !!h2?.classList.contains("toggletextColor"),
+      textColorBtnLight: !!textColorBtn?.classList.contains("textColorLight"),
+      bgColor: card.style.backgroundColor || "",
+      themePressed: !!themeBtn?.classList.contains("pressed"),
+      themeBtnBg: themeBtn?.style.backgroundColor || "",
+      themeBtnBorder: themeBtn?.style.border || "",
+      changeColorIconWhite: !!(changeColorIcon && changeColorIcon.style.color === "white")
+    });
+  });
+  return tasks;
+}
+
+function saveApp() {
+  const data = {
+    tasks: collectTasksFromDOM(),
+    savedColors
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadApp() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return { tasks: [], savedColors: [] };
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return { tasks: [], savedColors: [] };
+  }
+}
+
+// ========================= بناء/ترميم واجهة الألوان المحفوظة =========================
+function rebuildSavedColorsUI() {
+  savedColorsContainer.innerHTML = "";
+  savedColors.forEach((rgba) => {
+    const colorBox = document.createElement("div");
+    colorBox.style.width = "30px";
+    colorBox.style.height = "30px";
+    colorBox.style.borderRadius = "4px";
+    colorBox.style.cursor = "pointer";
+    colorBox.style.border = "1px solid #ccc";
+    colorBox.style.backgroundColor = rgba;
+    colorBox.style.marginBottom = "5px";
+    colorBox.addEventListener("click", () => {
+      colorPicker.color.set(rgba);
+      if (currentCard) {
+        applyCardColor(currentCard, rgba);
+        saveApp();
+      }
+    });
+    savedColorsContainer.appendChild(colorBox);
+  });
+}
+
+// ========================= تطبيق لون على بطاقة =========================
+function applyCardColor(card, rgba) {
+  const themeBtn = card.querySelector(".theme");
+  const changeColor = card.querySelector(".changeColor");
+
+  card.style.backgroundColor = rgba;
+  card.style.setProperty("--card-bg-color", rgba);
+  card.classList.add("randomColor");
+
+  if (themeBtn) {
+    themeBtn.style.backgroundColor = rgba;
+    themeBtn.style.border = "3px solid rgba(255, 255, 255, 0.5)";
+    themeBtn.classList.add("pressed");
+  }
+  if (changeColor) changeColor.style.color = "white";
+}
+
+// ========================= بناء بطاقة مهمة =========================
+function createCardFromData(task) {
+  const newCard = document.createElement("div");
+  newCard.classList.add("card");
+
+  // HTML البطاقة (مطابق لبناءك الحالي)
+  newCard.innerHTML = `
+    <div class="buttons-sec">
+      <button class="edit btn1"><i class="fa-solid fa-pencil"></i></button>
+      <button class="done btn2 ${task.done ? "clicked" : ""}">
+        <i class="doneIcon fa-solid ${task.done ? "fa-circle-minus" : "fa-check"}"></i>
+      </button>
+      <button class="delete btn3"><i class="fa-solid fa-trash-can"></i></button>
+
+      <div class="windowDelete window-delete" style="display:none;">
+        <h2>Are you sure you want to delete?</h2>
+        <div class="option">
+          <button class="opDelete yesBtn">Yes</button>
+          <button class="opUndo noBtn">No</button>
+        </div>
+      </div>
+
+      <button class="theme btn4 ${task.themePressed ? "pressed" : ""}" style="${task.themeBtnBg ? `background-color:${task.themeBtnBg};` : ""}${task.themeBtnBorder ? `border:${task.themeBtnBorder};` : ""}">
+        <i class="changeColor fa-solid fa-brush" style="${task.changeColorIconWhite ? "color:white;" : ""}"></i>
+      </button>
+    </div>
+
+    <div class="time">
+      <span>${task.time}</span>
+    </div>
+
+    <div class="txt">
+      <h2 class="h2 txt ${task.textColored ? "toggletextColor" : ""}">${task.text}</h2>
+    </div>
+
+    <button class="textColor ${task.textColorBtnLight ? "textColorLight" : ""}"></button>
+  `;
+
+  // تطبيق لون الخلفية إن وجد
+  if (task.bgColor) {
+    applyCardColor(newCard, task.bgColor);
+  }
+
+  attachEvents(newCard);
+  mainContent.appendChild(newCard);
+}
+
+// ========================= إرفاق الأحداث للبطاقة =========================
+function attachEvents(card) {
+  const doneBtn = card.querySelector(".done");
+  const doneIcon = card.querySelector(".doneIcon");
+  const editBtn = card.querySelector(".edit");
+  const deleteBtn = card.querySelector(".delete");
+  const textColorBtn = card.querySelector(".textColor");
+  const themeBtn = card.querySelector(".theme");
+  const changeColor = card.querySelector(".changeColor");
+  const windowDelete = card.querySelector(".windowDelete");
+  const opDeleteBtn = card.querySelector(".opDelete");
+  const opUndoBtn = card.querySelector(".opUndo");
+  const h2 = card.querySelector(".h2");
+
+  // إنجاز/إلغاء الإنجاز
+  doneBtn.addEventListener("click", () => {
+    doneBtn.classList.toggle("clicked");
+    doneIcon.classList.toggle("fa-check");
+    doneIcon.classList.toggle("fa-circle-minus");
+    saveApp();
+  });
+
+  // لون النص
+  textColorBtn.addEventListener("click", () => {
+    h2.classList.toggle("toggletextColor");
+    textColorBtn.classList.toggle("textColorLight");
+    saveApp();
+  });
+
+  // تحرير النص (بنفس أسلوبك مع input)
+  function enableEditMode() {
+    const txtContainer = card.querySelector(".txt");
+    const oldH2 = txtContainer.querySelector("h2");
+    const currentText = oldH2.textContent;
+
+    txtContainer.innerHTML = `<input type="text" class="edit-input" value="${currentText}">`;
+    const input = txtContainer.querySelector("input");
+    input.style.direction = "ltr";
+    input.focus();
+    input.select();
+
+  function exitEditMode() {
+    const finalText = input.value.trim() || currentText;
+    txtContainer.innerHTML = `<h2 class="h2 txt">${finalText}</h2>`;
+    const newH2 = txtContainer.querySelector("h2");
+
+    // تحديث لون الدائرة حسب لون النص بعد التعديل
+    if (newH2.classList.contains("toggletextColor")) {
+      textColorBtn.classList.add("textColorLight"); // النص أبيض → الدائرة سوداء
+    } else {
+      textColorBtn.classList.remove("textColorLight"); // النص أسود → الدائرة بيضاء
+    }
+
+    // لا نربط حدث جديد، نستخدم نفس الدالة toggle الموجودة مسبقًا
+    // فقط تأكد أن كل مرة تضغط على الدائرة، تتحقق من النص الحالي
+    textColorBtn.onclick = () => {
+      newH2.classList.toggle("toggletextColor");
+      if (newH2.classList.contains("toggletextColor")) {
+        textColorBtn.classList.add("textColorLight");
+      } else {
+        textColorBtn.classList.remove("textColorLight");
+      }
+      saveApp();
+    };
+
+    saveApp();
+  }
+
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") exitEditMode();
+    });
+    input.addEventListener("blur", exitEditMode);
+  }
+
+  editBtn.addEventListener("click", enableEditMode);
+
+  // حذف بطاقة (بنافذة تأكيدك الحالية)
+  deleteBtn.addEventListener("click", () => (windowDelete.style.display = "block"));
+  opDeleteBtn.addEventListener("click", () => {
+    card.remove();
+    updateDeleteAllButtonVisibility();
+    saveApp();
+  });
+  opUndoBtn.addEventListener("click", () => (windowDelete.style.display = "none"));
+
+  // زر الفرشاة: لون عشوائي بالضغط
+  themeBtn.addEventListener("click", () => {
+    const color = getRandomHexColor();
+    applyCardColor(card, color);
+    hideColorPicker();
+    saveApp();
+  });
+
+  // إظهار الـ Color Picker عند الوقوف 1.5 ثانية
+  themeBtn.addEventListener("mouseenter", () => {
+    hoverTimer = setTimeout(() => showColorPicker(themeBtn, card), 1500);
+  });
+  themeBtn.addEventListener("mouseleave", () => clearTimeout(hoverTimer));
+
+  // ضغطة مطوّلة 1 ثانية لإزالة اللون
+  themeBtn.addEventListener("mousedown", () => {
+    pressTimer = setTimeout(() => {
+      card.style.backgroundColor = "";
+      card.classList.remove("randomColor");
+      themeBtn.style.backgroundColor = "";
+      themeBtn.style.border = "none";
+      themeBtn.classList.remove("pressed");
+      if (changeColor) changeColor.style.color = "";
+      hideColorPicker();
+      saveApp();
+    }, 1000);
+  });
+  themeBtn.addEventListener("mouseup", () => clearTimeout(pressTimer));
+  themeBtn.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+}
+
+// ========================= Color Picker events =========================
+// تحديث اللون أثناء السحب فقط (بدون حفظ فوري)
+colorPicker.on("color:change", (color) => {
+  const rgba = color.rgbaString;
+  isDragging = true;
+  if (currentCard) {
+    applyCardColor(currentCard, rgba);
+  }
+});
+
+// عند إفلات الماوس: نحفظ اللون ونضيفه للألوان المحفوظة (مع حد أقصى)
+colorPickerContainer.addEventListener("mouseup", () => {
+  if (!isDragging) return;
+  isDragging = false;
+
+  const rgba = colorPicker.color.rgbaString;
+  // أضف للبطاقة الحالية وحفّظ
+  if (currentCard) {
+    applyCardColor(currentCard, rgba);
+    saveApp();
+  }
+
+  // إدارة قائمة الألوان المحفوظة
+  if (!savedColors.includes(rgba)) {
+    if (savedColors.length >= maxSavedColors) {
+      savedColors.shift();
+    }
+    savedColors.push(rgba);
+    rebuildSavedColorsUI();
+    saveApp();
+  }
+});
+
+// إخفاء الـ Color Picker عند النقر خارج
+document.addEventListener("click", (e) => {
+  if (
+    !colorPickerContainer.contains(e.target) &&
+    !(currentCard && currentCard.querySelector(".theme").contains(e.target))
+  ) {
+    hideColorPicker();
+  }
+});
+
+// ========================= إضافة مهمة جديدة =========================
+addNewTaskBtn.addEventListener("click", () => {
+  const task = {
+    text: "New Task",
+    time: new Date().toLocaleString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    }),
+    done: false,
+    textColored: false,
+    textColorBtnLight: false,
+    bgColor: "",
+    themePressed: false,
+    themeBtnBg: "",
+    themeBtnBorder: "",
+    changeColorIconWhite: false
+  };
+
+  createCardFromData(task);
+  updateDeleteAllButtonVisibility();
+  saveApp();
+});
+
+// ========================= حذف الكل =========================
+deleteAllBtn.addEventListener("click", () => {
+  windowDeleteAll.style.display = "block";
+});
+yesBtnDeleteAll.addEventListener("click", () => {
+  // تفريغ كل المهام
+  mainContent.innerHTML = "";
+  // إعادة ضبط البيانات
+  savedColors = [];
+  rebuildSavedColorsUI();
+  windowDeleteAll.style.display = "none";
+  updateDeleteAllButtonVisibility();
+  saveApp();
+});
+noBtnDeleteAll.addEventListener("click", () => {
+  windowDeleteAll.style.display = "none";
+});
+
+// ========================= التحميل الأولي =========================
+window.addEventListener("DOMContentLoaded", () => {
+  const data = loadApp();
+
+  // أعد بناء الألوان المحفوظة
+  savedColors = Array.isArray(data.savedColors) ? data.savedColors : [];
+  rebuildSavedColorsUI();
+
+  // أعد بناء المهام
+  if (Array.isArray(data.tasks)) {
+    data.tasks.forEach((t) => createCardFromData(t));
+  }
+
+  updateDeleteAllButtonVisibility();
+});
+</script>
+
+
+</body>
+</html>
+

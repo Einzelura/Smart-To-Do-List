@@ -1,0 +1,42 @@
+{
+  "name": "project-1---smart-todo-list",
+  "version": "1.0.0",
+  "main": "main.js",
+  "description": "Smart To Do List app built with Electron",
+  "author": {
+    "name": "Hisham Shalabi",
+    "email": "your-email@example.com"
+  },
+  "homepage": "https://your-project-homepage-or-github.com",
+  "license": "ISC",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:unsigned": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^37.3.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.smart.todo.list",
+    "productName": "Smart Todo List",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "index.html",
+      "assets/**/*",
+      "package.json"
+    ],
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
