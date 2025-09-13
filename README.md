@@ -37,7 +37,6 @@ It’s designed to make task management **fast, customizable, and visually pleas
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/Einzelura/smart-todo-list.git
-cd smart-todo-list
+git clone https://github.com/Einzelura/Smart-To-Do-List
 npm install
 npm start
